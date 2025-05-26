@@ -1,0 +1,14 @@
+# Workspace version: 1.45.28
+databutton==0.38.34
+fastapi==0.115.2
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+ipykernel==6.29.5
+openai
+beautifulsoup4
+requests
+google-cloud-vision
+databutton==0.38.34
+fastapi==0.111.0
+python-multipart==0.0.9
+uvicorn[standard]==0.29.0
