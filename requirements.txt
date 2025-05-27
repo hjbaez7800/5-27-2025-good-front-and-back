@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-dotenv
+stripe
+aiofiles
+jinja2
+requests
