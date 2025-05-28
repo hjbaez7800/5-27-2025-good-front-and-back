@@ -20,7 +20,8 @@ export const API_PATH = __API_PATH__;
 declare const __API_URL__: string;
 export const API_URL = __API_URL__;
 
-export const API_HOST = `https://${process.env.NEXT_PUBLIC_API_URL}` || "http://localhost:8000";
+const envHost = process.env.NEXT_PUBLIC_API_URL;
+export const API_HOST = envHost ? `https://${envHost}` : "http://localhost:8000";
 
 export const API_PREFIX_PATH = process.env.NEXT_PUBLIC_API_PREFIX_PATH || "";
 
