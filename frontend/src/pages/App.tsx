@@ -721,7 +721,11 @@ export default function App() {
 
         try {
             console.log("Calling brain.calculate_castle_verde_index for single item balancing with body:", requestBody);
-            const response = await brain.calculate_castle_verde_index(requestBody);
+           const response = await fetch("https://meta-balance-app.onrender.com/routes/castle-verde/calculate-index", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
 
             if (!response.ok) {
                 let errorDetail = `Balancing API request failed with status: ${response.status}`;
