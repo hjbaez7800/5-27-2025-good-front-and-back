@@ -10,10 +10,10 @@ const constructBaseUrl = (): string => {
     return `${window.location.origin}${API_PATH}`;
   }
 
-  if (API_HOST && API_PREFIX_PATH) {
-    // In deployed app (prod)
-    return `https://${API_HOST}${API_PREFIX_PATH}`;
-  }
+  if (API_HOST) {
+  // In deployed app (prod)
+  return `https://${API_HOST}/routes`;
+}
 
   // In deployed app (prod)
   return `https://api.databutton.com${API_PATH}`;
