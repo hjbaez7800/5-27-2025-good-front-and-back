@@ -14,12 +14,12 @@ def get_router_config() -> dict:
         # Note: This file is not available to the agent
         cfg = json.loads(open("routers.json").read())
     except:
-        return False
+        return {"routers": {}}  # fallback
     return cfg
 
 
 def is_auth_disabled(router_config: dict, name: str) -> bool:
-    return router_config["routers"][name]["disableAuth"]
+    return router_config.get("routers", {}).get(name, {}).get("disableAuth", False)
 
 
 def import_api_routers() -> APIRouter:
@@ -28,14 +28,13 @@ def import_api_routers() -> APIRouter:
 
     router_config = get_router_config()
 
-    src_path = pathlib.Path(__file__).parent
-
-    # Import API routers from "src/app/apis/*/__init__.py"
-    apis_path = src_path / "app" / "apis"
+    # Correct base path — should resolve to /backend/app/apis
+    apis_path = pathlib.Path(__file__).parent / "app" / "apis"
 
     api_names = [
-        p.relative_to(apis_path).parent.as_posix()
-        for p in apis_path.glob("*/__init__.py")
+        p.parent.name
+        for p in apis_path.rglob("__init__.py")
+        if p.parent.is_dir()
     ]
 
     api_module_prefix = "app.apis."
@@ -43,7 +42,7 @@ def import_api_routers() -> APIRouter:
     for name in api_names:
         print(f"Importing API: {name}")
         try:
-            api_module = __import__(api_module_prefix + name, fromlist=[name])
+            api_module = __import__(api_module_prefix + name, fromlist=["router"])
             api_router = getattr(api_module, "router", None)
             if isinstance(api_router, APIRouter):
                 routes.include_router(
@@ -55,10 +54,8 @@ def import_api_routers() -> APIRouter:
                     ),
                 )
         except Exception as e:
-            print(e)
+            print(f"Failed to import router for {name}: {e}")
             continue
-
-    print(routes.routes)
 
     return routes
 
