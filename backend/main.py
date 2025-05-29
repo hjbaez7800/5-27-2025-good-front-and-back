@@ -3,6 +3,7 @@ import pathlib
 import json
 import dotenv
 from fastapi import FastAPI, APIRouter, Depends
+from fastapi.middleware.cors import CORSMiddleware
 
 dotenv.load_dotenv()
 
@@ -11,10 +12,9 @@ from databutton_app.mw.auth_mw import AuthConfig, get_authorized_user
 
 def get_router_config() -> dict:
     try:
-        # Note: This file is not available to the agent
         cfg = json.loads(open("routers.json").read())
     except:
-        return {"routers": {}}  # fallback
+        return {"routers": {}}
     return cfg
 
 
@@ -23,20 +23,15 @@ def is_auth_disabled(router_config: dict, name: str) -> bool:
 
 
 def import_api_routers() -> APIRouter:
-    """Create top level router including all user defined endpoints."""
     routes = APIRouter(prefix="/routes")
-
     router_config = get_router_config()
 
-    # Correct base path — should resolve to /backend/app/apis
     apis_path = pathlib.Path(__file__).parent / "app" / "apis"
-
     api_names = [
         p.parent.name
         for p in apis_path.rglob("__init__.py")
         if p.parent.is_dir()
     ]
-
     api_module_prefix = "app.apis."
 
     for name in api_names:
@@ -63,17 +58,24 @@ def import_api_routers() -> APIRouter:
 def get_firebase_config() -> dict | None:
     extensions = os.environ.get("DATABUTTON_EXTENSIONS", "[]")
     extensions = json.loads(extensions)
-
     for ext in extensions:
         if ext["name"] == "firebase-auth":
             return ext["config"]["firebaseConfig"]
-
     return None
 
 
 def create_app() -> FastAPI:
-    """Create the app. This is called by uvicorn with the factory option to construct the app object."""
     app = FastAPI()
+
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # You can restrict this to your Vercel URL later
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     app.include_router(import_api_routers())
 
     for route in app.routes:
@@ -82,7 +84,6 @@ def create_app() -> FastAPI:
                 print(f"{method} {route.path}")
 
     firebase_config = get_firebase_config()
-
     if firebase_config is None:
         print("No firebase config found")
         app.state.auth_config = None
@@ -93,7 +94,6 @@ def create_app() -> FastAPI:
             "audience": firebase_config["projectId"],
             "header": "authorization",
         }
-
         app.state.auth_config = AuthConfig(**auth_config)
 
     return app
