@@ -26,7 +26,7 @@ export const API_HOST = rawHost?.startsWith("http")
   ? rawHost
   : rawHost
     ? `https://${rawHost}`
-    : "http://localhost:8000";
+    : "https://five-27-2025-good-front-and-back.onrender.com"; // updated fallback
 
 export const API_PREFIX_PATH = process.env.NEXT_PUBLIC_API_PREFIX_PATH || "";
 
