@@ -100,3 +100,8 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Castle Verde API is live"}
