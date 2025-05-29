@@ -11,9 +11,9 @@ const constructBaseUrl = (): string => {
   }
 
   if (API_HOST) {
-  // In deployed app (prod)
-  return API_HOST;
-}
+    // In deployed app (prod)
+    return API_HOST;
+  }
 
   // In deployed app (prod)
   return `https://api.databutton.com${API_PATH}`;
@@ -32,12 +32,13 @@ const constructClient = () => {
   const baseApiParams = constructBaseApiParams();
 
   return new Brain({
-  baseUrl,
-  baseApiParams,
-  customFetch: (url, options) => {
-    return fetch(url, options);
-  },
-});
+    baseUrl,
+    baseApiParams,
+    customFetch: (url, options) => {
+      return fetch(url, options);
+    },
+  });
+};
 
 const brain = constructClient();
 
