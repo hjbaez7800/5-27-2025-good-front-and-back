@@ -12,7 +12,7 @@ const constructBaseUrl = (): string => {
 
   if (API_HOST) {
   // In deployed app (prod)
-  return `https://${API_HOST}/routes`;
+  return API_HOST;
 }
 
   // In deployed app (prod)
@@ -32,19 +32,12 @@ const constructClient = () => {
   const baseApiParams = constructBaseApiParams();
 
   return new Brain({
-    baseUrl,
-    baseApiParams,
-    customFetch: (url, options) => {
-      if (API_HOST && API_HOST !== "api.databutton.com") {
-        // Remove /routes/ segment from start of path if
-        // running API through custom domain
-        return fetch(url.replace("/api/routes/", "/api/"), options);
-      }
-
-      return fetch(url, options);
-    },
-  });
-};
+  baseUrl,
+  baseApiParams,
+  customFetch: (url, options) => {
+    return fetch(url, options);
+  },
+});
 
 const brain = constructClient();
 
